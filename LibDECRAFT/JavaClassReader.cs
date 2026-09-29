@@ -64,6 +64,7 @@ namespace LibDECRAFT
             for (int x = 0; x < nEntriesFieldTable; x++)
             {
                 JavaFieldInfo newField = new JavaFieldInfo();
+                newField.parentClass = ret;
                 newField.accessFlags = Utils.StreamReadShort(input);
                 newField.nameIndex = Utils.StreamReadShort(input);
                 newField.descriptorIndex = Utils.StreamReadShort(input);
@@ -86,6 +87,7 @@ namespace LibDECRAFT
             for (int x = 0; x < nEntriesMethodTable; x++)
             {
                 JavaMethodInfo newMethod = new JavaMethodInfo();
+                newMethod.parentClass = ret;
                 newMethod.accessFlags = Utils.StreamReadShort(input);
                 newMethod.nameIndex = Utils.StreamReadShort(input);
                 newMethod.descriptorIndex = Utils.StreamReadShort(input);

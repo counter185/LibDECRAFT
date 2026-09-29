@@ -2,20 +2,19 @@
 
 namespace LibDECRAFT
 {
-    public partial class JavaClassReader
+    public class JavaFieldInfo
     {
-        public class JavaFieldInfo
-        {
-            public short accessFlags;
-            public short nameIndex;
-            public short descriptorIndex;
+        public JavaClassInfo parentClass;
 
-            public bool IsPublic => (accessFlags & 0x0001) != 0;
-            public bool IsStatic => (accessFlags & 0x0008) != 0;
+        public short accessFlags;
+        public short nameIndex;
+        public short descriptorIndex;
 
-            public string Descriptor(List<ConstantPoolEntry> constantPool) => ((ConstantPoolEntry.StringEntry)constantPool[descriptorIndex]).value;
+        public bool IsPublic => (accessFlags & 0x0001) != 0;
+        public bool IsStatic => (accessFlags & 0x0008) != 0;
 
-            public string Name(List<ConstantPoolEntry> constantPool) => ((ConstantPoolEntry.StringEntry)constantPool[nameIndex]).value;
-        }
+        public string Descriptor => ((ConstantPoolEntry.StringEntry)parentClass.entries[descriptorIndex]).value;
+
+        public string Name => ((ConstantPoolEntry.StringEntry)parentClass.entries[nameIndex]).value;
     }
 }

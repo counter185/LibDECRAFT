@@ -15,28 +15,37 @@ namespace LibDECRAFT.Test
         [Test]
         public void TestPackageName()
         {
-            Assert.That(cl.ThisClassName(cl.entries), Is.EqualTo("pl/cntrpl/TestClass"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(cl.ThisClassName, Is.EqualTo("pl/cntrpl/TestClass"));
+                Assert.That(cl.SuperClassName, Is.EqualTo("java/lang/Object"));
+            });
         }
 
         [Test]
         public void TestFindMethods()
         {
-            Assert.That(cl.methods.Any(x=>x.Name(cl.entries) == "MethodA"), 
-                "Find MethodA");
-            //Console.WriteLine(cl.methods.Where(x => x.Name(cl.entries) == "MethodB").First().Descriptor(cl.entries));
-            Assert.That(cl.methods.Any(x=>x.Name(cl.entries) == "MethodB" && x.Descriptor(cl.entries) == "(II)Z"), 
-                "Find MethodB and check its descriptor");
+            Assert.Multiple(() =>
+            {
+                Assert.That(cl.methods.Any(x=>x.Name == "MethodA"), 
+                    "Find MethodA");
+                Assert.That(cl.methods.Any(x=>x.Name == "MethodB" && x.Descriptor == "(II)Z"), 
+                    "Find MethodB and check its descriptor");
+            });
         }
 
         [Test]
         public void TestFindFields()
         {
-            Assert.That(cl.fields.Any(x => x.Name(cl.entries) == "intField" && x.Descriptor(cl.entries) == "I"),
-                "Find intField");
-            Assert.That(cl.fields.Any(x => x.Name(cl.entries) == "boolField" && x.Descriptor(cl.entries) == "Z"),
-                "Find boolField");
-            Assert.That(cl.fields.Any(x => x.Name(cl.entries) == "stringField" && x.Descriptor(cl.entries) == "Ljava/lang/String;"),
-                "Find stringField");
+            Assert.Multiple(() =>
+            {
+                Assert.That(cl.fields.Any(x => x.Name == "intField" && x.Descriptor == "I"),
+                    "Find intField");
+                Assert.That(cl.fields.Any(x => x.Name== "boolField" && x.Descriptor == "Z"),
+                    "Find boolField");
+                Assert.That(cl.fields.Any(x => x.Name == "stringField" && x.Descriptor == "Ljava/lang/String;"),
+                    "Find stringField");
+            });
         }
     }
 }
