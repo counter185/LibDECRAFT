@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="LibDECRAFT.Test/LibDECRAFT.Test.csproj" />
+  <Project Path="LibDECRAFT/LibDECRAFT.csproj" />
+</Solution>
