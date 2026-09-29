@@ -73,6 +73,6 @@ foreach (ConstantPoolEntry entry in javaClass.entries)
 //    9 (LibDECRAFT.ConstantPoolEntry+FieldReferenceEntry)
 //    ...
 
-Console.WriteLine(((ConstantPoolEntry.StringEntry)cl.entries[4]).value);
+Console.WriteLine(((ConstantPoolEntry.StringEntry)javaClass.entries[4]).value);
 // -> java/lang/Object
 ```
