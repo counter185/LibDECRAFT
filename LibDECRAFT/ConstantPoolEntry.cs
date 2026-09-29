@@ -5,7 +5,9 @@ namespace LibDECRAFT
 {
     public class ConstantPoolEntry
     {
-        public int tag;
+        public JavaClassInfo parentClass;
+        public virtual int Tag() => 0;
+        public virtual ConstantPoolEntry Parse(Stream target) => null;
 
         public static ConstantPoolEntry[] idMap = new ConstantPoolEntry[] {
             null,
@@ -31,13 +33,9 @@ namespace LibDECRAFT
             new PackageEntry()
         };
 
-        public virtual ConstantPoolEntry Parse(Stream target)
-        {
-            return null;
-        }
 
         public class StringEntry : ConstantPoolEntry { 
-            public new int tag = 1; 
+            public override int Tag() => 1; 
             public string value = ""; 
             public override ConstantPoolEntry Parse(Stream target)
             {
@@ -51,49 +49,45 @@ namespace LibDECRAFT
             }
         }
         public class IntegerEntry : ConstantPoolEntry {
-            public new int tag = 3; 
+            public override int Tag() => 3;
             public int value;
             public override ConstantPoolEntry Parse(Stream target)
                 => new IntegerEntry { value = Utils.StreamReadInt(target) };
         }
         public class FloatEntry : ConstantPoolEntry {
-            public new int tag = 4; 
+            public override int Tag() => 4;
             public float value;
             public override ConstantPoolEntry Parse(Stream target)
                 => new FloatEntry { value = Utils.StreamReadFloat(target) };
         }
         public class LongEntry : ConstantPoolEntry {
-            public new int tag = 5; 
+            public override int Tag() => 5;
             public long value;
             public override ConstantPoolEntry Parse(Stream target)
                 => new LongEntry { value = Utils.StreamReadLong(target) };
         }
         public class DoubleEntry : ConstantPoolEntry {
-            public new int tag = 6; 
+            public override int Tag() => 6; 
             public double value;
             public override ConstantPoolEntry Parse(Stream target)
                 => new DoubleEntry { value = Utils.StreamReadDouble(target) };
         }
         public class ClassReferenceEntry : ConstantPoolEntry {
-            public new int tag = 7; 
+            public override int Tag() => 7; 
             public int indexOfClassNameString;
             public override ConstantPoolEntry Parse(Stream target)
-            {
-                ClassReferenceEntry newEntry = new ClassReferenceEntry();
-                newEntry.indexOfClassNameString = Utils.StreamReadShort(target);
-                return newEntry;
-            }
-            public string GetName(List<ConstantPoolEntry> constantPool) 
-                => ((StringEntry)constantPool[indexOfClassNameString]).value;
+                => new ClassReferenceEntry { indexOfClassNameString = Utils.StreamReadShort(target) };
+
+            public string Name => ((StringEntry)parentClass.entries[indexOfClassNameString]).value;
         }
         public class StringReferenceEntry : ConstantPoolEntry {
-            public new int tag = 8;
+            public override int Tag() => 8;
             public int indexOfTargetString;
             public override ConstantPoolEntry Parse(Stream target) 
                 => new StringReferenceEntry { indexOfTargetString = Utils.StreamReadShort(target) };
         }
         public class FieldReferenceEntry : ConstantPoolEntry {
-            public new int tag = 9; 
+            public override int Tag() => 9; 
             public int indexOfClassReference; 
             public int indexOfNameAndTypeDescriptor;
             public override ConstantPoolEntry Parse(Stream target)
@@ -105,28 +99,27 @@ namespace LibDECRAFT
             }
         }
         public class MethodReferenceEntry : ConstantPoolEntry { 
-            public new int tag = 10; 
+            public override int Tag() => 10; 
             public int indexOfClassReference; 
             public int indexOfNameAndTypeDescriptor;
 
-            public string ClassReferenceName(List<ConstantPoolEntry> constantPool) 
-                => ((ClassReferenceEntry)constantPool[indexOfClassReference]).GetName(constantPool);
+            public string ClassReferenceName 
+                => ((ClassReferenceEntry)parentClass.entries[indexOfClassReference]).Name;
 
-            public string Name(List<ConstantPoolEntry> constantPool)
-            {
-                NameAndTypeDescriptorEntry nameAndTypeDescriptor = (NameAndTypeDescriptorEntry)constantPool[indexOfNameAndTypeDescriptor];
-                return ((StringEntry)constantPool[nameAndTypeDescriptor.indexOfNameString]).value;
+            public string Name {
+                get {
+                    var nameAndTypeDescriptor = (NameAndTypeDescriptorEntry)parentClass.entries[indexOfNameAndTypeDescriptor];
+                    return ((StringEntry)parentClass.entries[nameAndTypeDescriptor.indexOfNameString]).value;
+                }
             }
-            public string Descriptor(List<ConstantPoolEntry> constantPool)
-            {
-                NameAndTypeDescriptorEntry nameAndTypeDescriptor = (NameAndTypeDescriptorEntry)constantPool[indexOfNameAndTypeDescriptor];
-                return ((StringEntry)constantPool[nameAndTypeDescriptor.indexOfTypeDescriptor]).value;
+            public string Descriptor {
+                get {
+                    NameAndTypeDescriptorEntry nameAndTypeDescriptor = (NameAndTypeDescriptorEntry)parentClass.entries[indexOfNameAndTypeDescriptor];
+                    return ((StringEntry)parentClass.entries[nameAndTypeDescriptor.indexOfTypeDescriptor]).value;
+                }
             }
 
-            public string NameAndDescriptor(List<ConstantPoolEntry> constantPool)
-            {
-                return Name(constantPool) + Descriptor(constantPool);
-            }
+            public string NameAndDescriptor => Name + Descriptor;
 
             public override ConstantPoolEntry Parse(Stream target)
             {
@@ -137,7 +130,7 @@ namespace LibDECRAFT
             }
         }
         public class InterfaceMethodReferenceEntry : ConstantPoolEntry { 
-            public new int tag = 11; 
+            public override int Tag() => 11; 
             public int indexOfClassReference; 
             public int indexOfNameAndTypeDescriptor;
             public override ConstantPoolEntry Parse(Stream target)
@@ -149,7 +142,7 @@ namespace LibDECRAFT
             }
         }
         public class NameAndTypeDescriptorEntry : ConstantPoolEntry {
-            public new int tag = 12; 
+            public override int Tag() => 12; 
             public int indexOfNameString; 
             public int indexOfTypeDescriptor;
             public override ConstantPoolEntry Parse(Stream target)
@@ -161,9 +154,9 @@ namespace LibDECRAFT
             }
         }
         public class MethodHandleEntry : ConstantPoolEntry { 
-            public new int tag = 15; 
-            byte typeDescriptor; 
-            int indexOfMethod;
+            public override int Tag() => 15; 
+            public byte typeDescriptor; 
+            public int indexOfMethod;
             public override ConstantPoolEntry Parse(Stream target)
             {
                 MethodHandleEntry newEntry = new MethodHandleEntry();
@@ -173,8 +166,8 @@ namespace LibDECRAFT
             }
         }
         public class MethodTypeEntry : ConstantPoolEntry {
-            public new int tag = 16; 
-            int indexOf;
+            public override int Tag() => 16; 
+            public int indexOf;
             public override ConstantPoolEntry Parse(Stream target)
             {
                 MethodTypeEntry newEntry = new MethodTypeEntry();
@@ -183,8 +176,8 @@ namespace LibDECRAFT
             }
         }
         public class DynamicEntry : ConstantPoolEntry {
-            public new int tag = 17; 
-            int data;
+            public override int Tag() => 17; 
+            public int data;
             public override ConstantPoolEntry Parse(Stream target)
             {
                 DynamicEntry newEntry = new DynamicEntry();
@@ -193,8 +186,8 @@ namespace LibDECRAFT
             }
         }
         public class InvokeDynamicEntry : ConstantPoolEntry {
-            public new int tag = 18; 
-            int data;
+            public override int Tag() => 18; 
+            public int data;
             public override ConstantPoolEntry Parse(Stream target)
             {
                 InvokeDynamicEntry newEntry = new InvokeDynamicEntry();
@@ -203,8 +196,8 @@ namespace LibDECRAFT
             }
         }
         public class ModuleEntry : ConstantPoolEntry { 
-            public new int tag = 19; 
-            int id;
+            public override int Tag() => 19; 
+            public int id;
             public override ConstantPoolEntry Parse(Stream target)
             {
                 ModuleEntry newEntry = new ModuleEntry();
@@ -213,14 +206,10 @@ namespace LibDECRAFT
             }
         }
         public class PackageEntry : ConstantPoolEntry {
-            public new int tag = 20; 
-            int id;
+            public override int Tag() => 20; 
+            public int id;
             public override ConstantPoolEntry Parse(Stream target)
-            {
-                PackageEntry newEntry = new PackageEntry();
-                newEntry.id = Utils.StreamReadShort(target);
-                return newEntry;
-            }
+                => new PackageEntry { id = Utils.StreamReadShort(target) };
         }
     }
 }

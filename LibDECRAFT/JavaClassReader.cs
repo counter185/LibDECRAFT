@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Net.Http.Headers;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LibDECRAFT
 {
@@ -21,6 +16,7 @@ namespace LibDECRAFT
 
             short nEntriesConstantPool = Utils.StreamReadShort(input);
             ret.entries = new List<ConstantPoolEntry>();
+            //empty entry at start (to line up entry indexes)
             ret.entries.Add(new ConstantPoolEntry());
             for (int x = 1; x < nEntriesConstantPool; x++)
             {
@@ -29,6 +25,7 @@ namespace LibDECRAFT
                 {
                     ConstantPoolEntry newCPoolEntry = ConstantPoolEntry.idMap[index].Parse(input);
                     //Console.WriteLine($"[{x}/{nEntriesConstantPool}] Adding new " + newCPoolEntry.GetType().Name + (newCPoolEntry is ConstantPoolEntry.StringEntry ? ": " + ((ConstantPoolEntry.StringEntry)newCPoolEntry).value : ""));
+                    newCPoolEntry.parentClass = ret;
                     if (newCPoolEntry is ConstantPoolEntry.DoubleEntry || newCPoolEntry is ConstantPoolEntry.LongEntry)
                     {
                         //i honestly have no idea why this works

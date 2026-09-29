@@ -4,6 +4,7 @@ public class TestClass {
     public int intField = 2;
     public boolean boolField = true;
     public String stringField = "test string";
+    public double doubleField = 1234.5678;
 
     public void MethodA() {
         System.out.println("MethodA()");

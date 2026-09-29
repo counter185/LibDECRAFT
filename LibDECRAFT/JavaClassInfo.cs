@@ -14,7 +14,9 @@ namespace LibDECRAFT
         public List<JavaMethodInfo> methods;
         public List<JavaFieldInfo> fields;
 
-        public string ThisClassName => (entries[thisClassNameIndex] is ConstantPoolEntry.ClassReferenceEntry) ? ((ConstantPoolEntry.ClassReferenceEntry)entries[thisClassNameIndex]).GetName(entries) : "<invalid>";
-        public string SuperClassName => (entries[superClassNameIndex] is ConstantPoolEntry.ClassReferenceEntry) ? ((ConstantPoolEntry.ClassReferenceEntry)entries[superClassNameIndex]).GetName(entries) : "<invalid>";
+        public string ThisClassName 
+            => (entries[thisClassNameIndex] is ConstantPoolEntry.ClassReferenceEntry) ? ((ConstantPoolEntry.ClassReferenceEntry)entries[thisClassNameIndex]).Name : "<invalid>";
+        public string SuperClassName 
+            => (entries[superClassNameIndex] is ConstantPoolEntry.ClassReferenceEntry) ? ((ConstantPoolEntry.ClassReferenceEntry)entries[superClassNameIndex]).Name : "<invalid>";
     }
 }
